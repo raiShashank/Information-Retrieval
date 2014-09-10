@@ -28,11 +28,15 @@ index_terms = sorted(index_terms)
 #for t in index_terms:
 #	print t, non_stopword[t]
 
-g = open("index/postings", "rb+")
-
+g = open("index/postings", "rb")
+#only have to read the file here
+flag = False
 for t in index_terms:
 	print t, "starts at", non_stopword[t][1]
-	if (non_stopword[t][2] == non_stopword[t][1]): continue
+	if (non_stopword[t][2] > non_stopword[t][1]): flag = True
+	else: 
+		print "Not appeared"
+		continue
 	g.seek(non_stopword[t][1])
 	for i in xrange(non_stopword[t][0]):
 		
@@ -51,6 +55,7 @@ for t in index_terms:
 			print a[0],
 
 	print
-
+	if flag:
+		break
 g.close()
 print(datetime.now()-startTime)

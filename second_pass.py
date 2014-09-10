@@ -54,12 +54,14 @@ print "---------------------------------"
 #for i in index_terms:
 #	print i, terms[i]
  
-print index_terms[-1]
-g = open("index/postings", "rb+")
+#print index_terms[-1]
+g = open("index/postings", "wb+")
+#Read-write mode. Overwrites the existing file if the file exists. If the
+#file does not exist, creates a new file for reading and writing.
 g.seek(terms[index_terms[-1]][2] - 1)
 g.write("\0")
 g.seek(0)
-print os.stat("index/postings").st_size
+
 
 
 def preprocess(repo, num_dir, num_file, chunk_size):
@@ -84,7 +86,7 @@ def preprocess(repo, num_dir, num_file, chunk_size):
 				raw = raw.lower()
 				word_tokenizer = nltk.RegexpTokenizer('\w+')
 				tokens = word_tokenizer.tokenize(raw)
-				#print tokens
+			
 				
  				for w in tokens:
 					if not w in exclude:
@@ -112,22 +114,20 @@ def preprocess(repo, num_dir, num_file, chunk_size):
 		index_terms = sorted(temp.keys())
 		for t in index_terms:
 			g.seek(terms[t][2] - g.tell(), 1)
-			print temp[t]
+			#print temp[t]
 			for l in temp[t]:
 				g.write(struct.pack("<q", l[0]))
-				#g.write(",")
 				g.write(struct.pack("<q", l[1]))
-				#g.write(",")
 				for pos in l[2]:
 					g.write(struct.pack("<q", pos))
-					#g.write(",")
-				
+					
 				terms[t][2] = g.tell()	
 		temp = {}
  
-preprocess("repo", 2, 10000, 5000)
+preprocess("repo", 162, 10000, 5000)
 g.close()
 pickle.dump(terms, open('pickle/non_stopword.dat', 'wb'))
 pickle.dump(stopword, open('pickle/stopword.dat', 'wb'))
 
+print "Size of file", os.stat("index/postings").st_size
 print(datetime.now()-startTime)
